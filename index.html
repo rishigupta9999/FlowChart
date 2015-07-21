@@ -4,13 +4,22 @@
 		<meta charset="utf-8">
 		<title>D3: Loading data from a CSV file</title>
 		<script type="text/javascript" src="d3/d3.v3.js"></script>
+		<script type="text/javascript" src="js/flowchart.js"></script>
 	</head>
 	<body>
 		<script type="text/javascript">
-
+			
+		var svg = d3.select("body")
+		            .append("svg")
+		            .attr("width", 500)
+		            .attr("height", 500);
+            
 			d3.json("Data/page1tidy.json", function(data) {
 				console.log(data);
+				fooFunc(7);
 			});
+			
+			
 
 		</script>
 	</body>
