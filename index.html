@@ -11,12 +11,12 @@
 			
 		var svg = d3.select("body")
 		            .append("svg")
-		            .attr("width", 500)
-		            .attr("height", 500);
+		            .attr("width", 1000)
+		            .attr("height", 1000);
             
 			d3.json("Data/page1tidy.json", function(data) {
 				console.log(data);
-				fooFunc(7);
+				initFlowchart(data);
 			});
 			
 			
