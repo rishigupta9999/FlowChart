@@ -1,3 +1,22 @@
+function shapeLabel(inShape)
+{
+	var label = null;
+	
+	if ("Text" in inShape)
+	{
+		if (typeof(inShape.Text) == "string")
+		{
+			label = inShape.Text;
+		}
+		else ("#text" in inShape.Text)
+		{
+			label = inShape.Text["#text"];
+		}
+	}
+	
+	return label;
+}
+
 function initFlowchart(data)
 {
 	var shapes = data.PageContents.Shapes.Shape;
@@ -33,19 +52,7 @@ function initFlowchart(data)
 		       var posX = cell["@V"];
 		       
 		       var shouldDisplay = false;
-		       var label = null;
-		       
-		       if ("Text" in curShape)
-		       {
-			       if (typeof(curShape.Text) == "string")
-			       {
-				       label = curShape.Text;
-			       }
-			       else ("#text" in curShape.Text)
-			       {
-				       label = curShape.Text["#text"];
-			       }
-		       }
+		       var label = shapeLabel(curShape);
 		       
 		       if (label != null)
 		       {
@@ -73,10 +80,9 @@ function initFlowchart(data)
 
 		       return posY * scaleY;
 	       })
-	       .attr("text")
-	       {
-		       
-	       }
+	       .attr("text", function(d, i) {
+		       return shapeLabel(shapes[i]);
+	       })
 	
 	var bar = [4, 5, 6, 7];
 	console.log(bar);
