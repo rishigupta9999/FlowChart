@@ -8,7 +8,7 @@ function ShapeLabel(inShape)
 		{
 			label = inShape.Text;
 		}
-		else ("#text" in inShape.Text)
+		else if ("#text" in inShape.Text)
 		{
 			label = inShape.Text["#text"];
 		}
@@ -72,13 +72,34 @@ function NormalizePositions(inShapes)
 function initFlowchart(data)
 {
 	var shapes = data.PageContents.Shapes.Shape;
+	
+	console.log(shapes);
 	var shapesToDraw = DisplayableShapes(shapes);
 	NormalizePositions(shapesToDraw);
 	
-	var rects = svg.selectAll("rect")
+	var scaleX = 150;
+	var scaleY = 150;
+	
+	var groups = svg.selectAll("g")
 	   .data(shapesToDraw)
 	   .enter()
-	   .append("rect");
+	   .append("g")
+	   .attr("transform", function(d, i) {
+		   var curShape = shapesToDraw[i];
+	       var cellX = curShape.Cell[0];
+	       var cellY = curShape.Cell[1];
+	       
+	       var name = cellX["@N"];
+	       console.assert(name == "PinX", "Expected PinX");
+	       
+	       name = cellY["@N"];
+	       console.assert(name == "PinY", "Expected PinY");
+	
+	       var posX = cellX["@V"] * scaleX;
+		   var posY = cellY["@V"] * scaleY;
+
+		   return "translate(" + posX + ", " + posY +  ")";
+		})
 	
 	var svgWidth = svg.attr("width");
 	var svgHeight = svg.attr("height");
@@ -86,41 +107,19 @@ function initFlowchart(data)
 	var rectHeight = 50;
 	var cellsWidth = svgWidth / rectWidth;
 	var cellsHeight = svgHeight / rectHeight;
-	var scaleX = 150;
-	var scaleY = 150;
 		   
-	rects.attr("width", rectWidth)
-	   .attr("height", rectHeight)
-	   .attr("fill", "white")
-	   .attr("stroke", "black")
-	   .attr("x", function(d, i) {
-	       
-	       var curShape = shapesToDraw[i];
-	       var cell = curShape.Cell[0];
-	       
-	       var name = cell["@N"];
-	       console.assert(name == "PinX", "Expected PinX");
-	
-	       var posX = cell["@V"];
-		   return posX * scaleX;
-	   })
-	   .attr("y", function(d, i) {
-	       var curShape = shapesToDraw[i];
-	       var cell = curShape.Cell[1];
-	       var name = cell["@N"];
-	       
-	       console.assert(name == "PinY", "Expected PinY");
-	
-	       var posY = cell["@V"]
-	
-	       return posY * scaleY;
-	   })
-	   
-	text = rects.append('text').text('foo')
-                .attr('x', 50)
-                .attr('y', 50)
-                .attr('fill', 'black')
-
+	groups.append("rect")
+		.attr("width", rectWidth)
+		.attr("height", rectHeight)
+		.attr("fill", "white")
+		.attr("stroke", "black");
+		
+	groups.append("text")
+		.attr("x", 10)
+		.attr("y", 20)
+		.text(function(d) {
+			return ShapeLabel(d)
+		});
 	
 	var bar = [4, 5, 6, 7];
 	console.log(bar);
