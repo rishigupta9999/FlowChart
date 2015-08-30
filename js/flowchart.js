@@ -41,7 +41,32 @@ function DisplayableShapes(inShapes)
 
 function NormalizePositions(inShapes)
 {
+	var length = inShapes.length;
 	
+	var minX = inShapes[0].Cell[0]["@V"];
+	var minY = inShapes[0].Cell[1]["@V"];
+	
+	for (var i = 0; i < length; i++)
+	{
+		var curX = inShapes[i].Cell[0]["@V"];
+		var curY = inShapes[i].Cell[1]["@V"];
+		
+		if (curX < minX)
+		{
+			minX = curX;
+		}
+		
+		if (curY < minY)
+		{
+			minY = curY;
+		}
+	}
+	
+	for (var i = 0; i < length; i++)
+	{
+		inShapes[i].Cell[0]["@V"] -= minX;
+		inShapes[i].Cell[1]["@V"] -= minY;
+	}
 }
 
 function initFlowchart(data)
@@ -80,7 +105,7 @@ function initFlowchart(data)
 		   return posX * scaleX;
 	   })
 	   .attr("y", function(d, i) {
-	       var curShape = shapes[i];
+	       var curShape = shapesToDraw[i];
 	       var cell = curShape.Cell[1];
 	       var name = cell["@N"];
 	       
@@ -90,9 +115,12 @@ function initFlowchart(data)
 	
 	       return posY * scaleY;
 	   })
-	   .attr("text", function(d, i) {
-	       return ShapeLabel(shapes[i]);
-	   })
+	   
+	text = rects.append('text').text('foo')
+                .attr('x', 50)
+                .attr('y', 50)
+                .attr('fill', 'black')
+
 	
 	var bar = [4, 5, 6, 7];
 	console.log(bar);
