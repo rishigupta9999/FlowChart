@@ -63,9 +63,7 @@ function initFlowchart(data)
 	var cellsHeight = svgHeight / rectHeight;
 	var scaleX = 150;
 	var scaleY = 150;
-	
-//		console.assert(false, "blah");
-	   
+		   
 	rects.attr("width", rectWidth)
 	   .attr("height", rectHeight)
 	   .attr("fill", "white")
@@ -79,23 +77,7 @@ function initFlowchart(data)
 	       console.assert(name == "PinX", "Expected PinX");
 	
 	       var posX = cell["@V"];
-	       
-	       var shouldDisplay = false;
-	       var label = ShapeLabel(curShape);
-	       
-	       if (label != null)
-	       {
-		       shouldDisplay = true;
-	       }
-	
-		   if (shouldDisplay)
-		   {
-			   return posX * scaleX;
-	       }
-	       else
-	       {
-		       return 0;
-	       }
+		   return posX * scaleX;
 	   })
 	   .attr("y", function(d, i) {
 	       var curShape = shapes[i];
