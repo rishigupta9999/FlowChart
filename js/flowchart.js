@@ -39,10 +39,16 @@ function DisplayableShapes(inShapes)
 	return shapesCopy;
 }
 
+function NormalizePositions(inShapes)
+{
+	
+}
+
 function initFlowchart(data)
 {
 	var shapes = data.PageContents.Shapes.Shape;
 	var shapesToDraw = DisplayableShapes(shapes);
+	NormalizePositions(shapesToDraw);
 	
 	var rects = svg.selectAll("rect")
 	   .data(shapesToDraw)
@@ -99,7 +105,6 @@ function initFlowchart(data)
 	       console.assert(name == "PinY", "Expected PinY");
 	
 	       var posY = cell["@V"]
-	       console.log(posY);
 	
 	       return posY * scaleY;
 	   })
