@@ -39,12 +39,71 @@ function DisplayableShapes(inShapes)
 	return shapesCopy;
 }
 
+function Connectors(inShapes)
+{
+	var shapesCopy = jQuery.extend(true, [], inShapes);
+	
+	var length = shapesCopy.length;
+	
+	for (var i = 0; i < length; i++)
+	{
+		var curShape = shapesCopy[i];
+		
+		var numCell = curShape["Cell"].length;
+		
+		var startX = 0;
+		var startY = 0;
+		var endX = 0;
+		var endY = 0;
+		var valid = 0;
+		
+		for (var c = 0; c < numCell; c++)
+		{
+			var curCell = curShape["Cell"][c];
+			
+			if (curCell["@N"] == "BeginX")
+			{
+				startX = curCell["@V"];
+				valid++;
+			}
+			else if (curCell["@N"] == "BeginY")
+			{
+				beginY = curCell["@V"];
+				valid++;
+			}
+			else if (curCell["@N"] == "EndX")
+			{
+				endX = curCell["@V"];
+				valid++;
+			}
+			if (curCell["@N"] == "EndY")
+			{
+				endY = curCell["@V"];
+				valid++;
+			}
+		}
+		
+		console.assert( ((valid == 0) || (valid == 4)), "Missing elements in line" );
+		
+		if (!valid)
+		{
+			shapesCopy.splice(i, 1);
+			length--;
+			i--;
+		}
+
+	}
+
+	return shapesCopy;
+}
+
 function NormalizePositions(inShapes)
 {
 	var length = inShapes.length;
 	
 	var minX = inShapes[0].Cell[0]["@V"];
 	var minY = inShapes[0].Cell[1]["@V"];
+	var maxY = minY;
 	
 	for (var i = 0; i < length; i++)
 	{
@@ -60,12 +119,19 @@ function NormalizePositions(inShapes)
 		{
 			minY = curY;
 		}
+		
+		if (curY > maxY)
+		{
+			curY = maxY;
+		}
 	}
+	
+	maxY -= minY;
 	
 	for (var i = 0; i < length; i++)
 	{
 		inShapes[i].Cell[0]["@V"] -= minX;
-		inShapes[i].Cell[1]["@V"] -= minY;
+		inShapes[i].Cell[1]["@V"] = maxY - (inShapes[i].Cell[1]["@V"] - minY);
 	}
 }
 
@@ -76,6 +142,8 @@ function initFlowchart(data)
 	console.log(shapes);
 	var shapesToDraw = DisplayableShapes(shapes);
 	NormalizePositions(shapesToDraw);
+	
+	var connectors = Connectors(shapes);
 	
 	var scaleX = 150;
 	var scaleY = 150;
