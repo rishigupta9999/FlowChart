@@ -1,3 +1,5 @@
+var minX = 0, minY = 0, maxY = 0;
+
 function ShapeLabel(inShape)
 {
 	var label = null;
@@ -68,7 +70,7 @@ function Connectors(inShapes)
 			}
 			else if (curCell["@N"] == "BeginY")
 			{
-				beginY = curCell["@V"];
+				startY = curCell["@V"];
 				valid++;
 			}
 			else if (curCell["@N"] == "EndX")
@@ -91,7 +93,13 @@ function Connectors(inShapes)
 			length--;
 			i--;
 		}
-
+		else
+		{
+			curShape.startX = startX;
+			curShape.startY = startY;
+			curShape.endX = endX;
+			curShape.endY = endY;
+		}
 	}
 
 	return shapesCopy;
@@ -101,9 +109,9 @@ function NormalizePositions(inShapes)
 {
 	var length = inShapes.length;
 	
-	var minX = inShapes[0].Cell[0]["@V"];
-	var minY = inShapes[0].Cell[1]["@V"];
-	var maxY = minY;
+	minX = inShapes[0].Cell[0]["@V"];
+	minY = inShapes[0].Cell[1]["@V"];
+	maxY = minY;
 	
 	for (var i = 0; i < length; i++)
 	{
@@ -135,6 +143,21 @@ function NormalizePositions(inShapes)
 	}
 }
 
+function NormalizeConnectors(inShapes)
+{
+	var length = inShapes.length;
+	
+	for (var i = 0; i < length; i++)
+	{
+		var curShape = inShapes[i];
+		
+		curShape.startX -= minX;
+		curShape.endX -= minX;
+		curShape.startY = maxY - (curShape.startY - minY);
+		curShape.endY = maxY - (curShape.endY - minY);
+	}
+}
+
 function initFlowchart(data)
 {
 	var shapes = data.PageContents.Shapes.Shape;
@@ -145,11 +168,13 @@ function initFlowchart(data)
 	
 	// Extract shapes that would be connectors (lines)
 	var connectors = Connectors(shapes);
-	NormalizePositions(shapes);
+	NormalizeConnectors(connectors);
+	
+	console.log(connectors);
 	
 	var scaleX = 150;
 	var scaleY = 150;
-	
+		
 	// Draw groups that will contain shape and text
 	var groups = svg.selectAll("g")
 	   .data(shapesToDraw)
@@ -199,11 +224,19 @@ function initFlowchart(data)
 					.data(connectors)
 					.enter()
 					.append("line")
-					.attr("x1", "0")
-					.attr("y1", "0")
-					.attr("x2", "250")
-					.attr("y2", "250")
-					.attr("stroke", "black");
+					.attr("x1", function(d, i) {
+						return connectors[i].startX * scaleX;
+					})
+					.attr("y1", function(d, i) {
+						return connectors[i].startY * scaleY;
+					})
+					.attr("x2", function(d, i) {
+						return connectors[i].endX * scaleX;
+					})
+					.attr("y2", function(d, i) {
+						return connectors[i].endY * scaleY;
+					})
+					.attr("stroke", "red");
 	
 	var bar = [4, 5, 6, 7];
 	console.log(bar);
