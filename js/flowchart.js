@@ -139,15 +139,18 @@ function initFlowchart(data)
 {
 	var shapes = data.PageContents.Shapes.Shape;
 	
-	console.log(shapes);
+	// Extract shapes that correspond to nodes on the flowchart 
 	var shapesToDraw = DisplayableShapes(shapes);
 	NormalizePositions(shapesToDraw);
 	
+	// Extract shapes that would be connectors (lines)
 	var connectors = Connectors(shapes);
+	NormalizePositions(shapes);
 	
 	var scaleX = 150;
 	var scaleY = 150;
 	
+	// Draw groups that will contain shape and text
 	var groups = svg.selectAll("g")
 	   .data(shapesToDraw)
 	   .enter()
@@ -175,19 +178,32 @@ function initFlowchart(data)
 	var rectHeight = 50;
 	var cellsWidth = svgWidth / rectWidth;
 	var cellsHeight = svgHeight / rectHeight;
-		   
+	
+	// Draw rectangles for the nodes
 	groups.append("rect")
 		.attr("width", rectWidth)
 		.attr("height", rectHeight)
 		.attr("fill", "white")
 		.attr("stroke", "black");
-		
+	
+	// Draw text
 	groups.append("text")
 		.attr("x", 10)
 		.attr("y", 20)
 		.text(function(d) {
 			return ShapeLabel(d)
 		});
+		
+	// Draw lines
+	var lines = svg.selectAll("lines")
+					.data(connectors)
+					.enter()
+					.append("line")
+					.attr("x1", "0")
+					.attr("y1", "0")
+					.attr("x2", "250")
+					.attr("y2", "250")
+					.attr("stroke", "black");
 	
 	var bar = [4, 5, 6, 7];
 	console.log(bar);
